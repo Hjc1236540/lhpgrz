@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鲜蔬汇 - 新鲜蔬菜直供</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/lucide@latest" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2B5D3A;
+      --primary-foreground: #ffffff;
+      --secondary: #4A90E2;
+      --secondary-foreground: #ffffff;
+      --accent: #F5A623;
+      --accent-foreground: #ffffff;
+      --destructive: #e53e3e;
+      --destructive-foreground: #ffffff;
+      --muted: #f7fafc;
+      --muted-foreground: #4a5568;
+      --popover: #ffffff;
+      --popover-foreground: #1a202c;
+      --card: #ffffff;
+      --card-foreground: #1a202c;
+      --border: #e2e8f0;
+      --input: #e2e8f0;
+      --ring: #2B5D3A;
+      --radius: 0.5rem;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: #f9fafb;
+    }
+
+    .text-gradient {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .btn {
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .card {
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-soldout {
+      background-color: #e53e3e;
+      color: white;
+    }
+
+    .badge-low {
+      background-color: #ed8936;
+      color: white;
+    }
+
+    .badge-stock {
+      background-color: #38a169;
+      color: white;
+    }
+
+    .stock-bar {
+      height: 4px;
+      background-color: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .stock-bar-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #1a202c;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #4a5568;
+      margin-bottom: 4rem;
+    }
+
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+          <div class="w-10 h-10 bg-[var(--primary)] rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          </div>
+          <span class="text-2xl font-bold text-gradient">鲜蔬汇</span>
+        </div>
+
+        <!-- Search Bar -->
+        <form onsubmit="handleSearch(event)" class="hidden md:flex flex-1 max-w-lg mx-8">
+          <div class="relative w-full">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="搜索蔬菜名称..."
+              class="w-full pl-12 pr-4 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+        </form>
+
+        <!-- Navigation -->
+        <nav class="hidden md:flex items-center space-x-6">
+          <a href="#products" class="text-gray-700 hover:text-[var(--primary)] font-medium">
+            全部产品
+          </a>
+          <a href="#contact" class="text-gray-700 hover:text-[var(--primary)] font-medium">
+            联系我们
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-r from-green-600 to-green-400 overflow-hidden">
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=%2760%27 height=%2760%27 viewBox=%270 0 60 60%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M30 5c-2 0-3.5 1.5-3.5 3.5S28 12 30 12s3.5-1.5 3.5-3.5S32 5 30 5zm-10-3c-1.5 0-2.5 1-2.5 2.5s1 2.5 2.5 2.5 2.5-1 2.5-2.5-1-2.5-2.5-2.5zm20 0c-1.5 0-2.5 1-2.5 2.5s1 2.5 2.5 2.5 2.5-1 2.5-2.5-1-2.5-2.5-2.5zM30 15c-5 0-9 4-9 9v6h18v-6c0-5-4-9-9-9z%27 fill=%27%23ffffff%27 fill-opacity=%270.3%27/%3E%3C/svg%3E');"></div>
+      </div>
+      <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 relative">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 text-white mb-8 md:mb-0">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              每日清晨采摘<br />新鲜直达餐桌
+            </h1>
+            <p class="text-xl mb-8 opacity-90">
+              精选优质蔬菜产地，新鲜有保障，价格透明，库存实时更新
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <a href="#products" class="btn bg-white text-green-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all">
+                查看产品
+              </a>
+              <a href="#contact" class="btn bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white/10 transition-all">
+                联系我们
+              </a>
+            </div>
+          </div>
+          <div class="md:w-1/2 flex justify-center">
+            <div class="relative">
+              <div class="w-64 h-64 md:w-80 md:h-80 bg-white/20 rounded-full flex items-center justify-center float-animation">
+                <span class="text-8xl md:text-9xl">🥬</span>
+              </div>
+              <div class="absolute -top-4 -right-4 bg-white rounded-full p-3 shadow-lg">
+                <span class="text-3xl">🥕</span>
+              </div>
+              <div class="absolute -bottom-2 -left-2 bg-white rounded-full p-3 shadow-lg">
+                <span class="text-2xl">🍅</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-white">50+</div>
+            <div class="text-white/80 text-sm">蔬菜品种</div>
+          </div>
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-white">1000+</div>
+            <div class="text-white/80 text-sm">日均销量</div>
+          </div>
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-white">98%</div>
+            <div class="text-white/80 text-sm">客户好评</div>
+          </div>
+          <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-white">24h</div>
+            <div class="text-white/80 text-sm">产地直供</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-12 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="section-title">新鲜蔬菜</h2>
+        <p class="section-subtitle">实时库存 · 价格透明 · 产地直供</p>
+
+        <!-- Category Filter -->
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+          <button
+            onclick="filterProducts('all')"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-[var(--primary)] text-white shadow-lg"
+            id="category-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>全部</span>
+          </button>
+          <button
+            onclick="filterProducts('leafy')"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-white text-gray-600 hover:bg-gray-100"
+            id="category-leafy"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>叶菜类</span>
+          </button>
+          <button
+            onclick="filterProducts('root')"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-white text-gray-600 hover:bg-gray-100"
+            id="category-root"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>根茎类</span>
+          </button>
+          <button
+            onclick="filterProducts('fruit')"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-white text-gray-600 hover:bg-gray-100"
+            id="category-fruit"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>果实类</span>
+          </button>
+          <button
+            onclick="filterProducts('mushroom')"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-white text-gray-600 hover:bg-gray-100"
+            id="category-mushroom"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>菌菇类</span>
+          </button>
+          <button
+            onclick="filterProducts('poultry')"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-white text-gray-600 hover:bg-gray-100"
+            id="category-poultry"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+            <span>家禽类</span>
+          </button>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6" id="products-grid">
+          <!-- Product cards will be generated by JavaScript -->
+        </div>
+
+        <div id="no-products" class="text-center py-16 hidden">
+          <span class="text-6xl mb-4 block">🔍</span>
+          <p class="text-gray-500 text-lg">暂无符合条件的商品</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div class="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-[var(--primary)] mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">新鲜直达</h3>
+            <p class="text-sm text-gray-500">每日清晨采摘，24小时配送</p>
+          </div>
+          <div class="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-[var(--primary)] mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">产地直供</h3>
+            <p class="text-sm text-gray-500">精选全国各地优质产地</p>
+          </div>
+          <div class="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-[var(--primary)] mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">品质保证</h3>
+            <p class="text-sm text-gray-500">严格品控，新鲜看得见</p>
+          </div>
+          <div class="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-[var(--primary)] mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <h3 class="font-semibold text-gray-800 mb-1">售后无忧</h3>
+            <p class="text-sm text-gray-500">有问题随时联系客服</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="contact" class="bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Brand -->
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <div class="w-10 h-10 bg-[var(--primary)] rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <span class="text-2xl font-bold">鲜蔬汇</span>
+          </div>
+          <p class="text-gray-400 text-sm mb-4">
+            专注新鲜蔬菜直供，让每一口都是自然的味道
+          </p>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h3 class="font-bold mb-4">联系我们</h3>
+          <ul class="space-y-3 text-gray-400 text-sm">
+            <li class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>17398727186</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>chaojunhu521@163.com</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mt-0.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>湖南省怀化市靖州县炮团村四乡所</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Business Hours -->
+        <div>
+          <h3 class="font-bold mb-4">营业时间</h3>
+          <ul class="space-y-2 text-gray-400 text-sm">
+            <li>周一至周五: 9:00 - 20:00</li>
+            <li>周六至周日: 9:00 - 22:00</li>
+            <li>节假日正常营业</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
+        <p>&copy; 2024 鲜蔬汇. All rights reserved. | 胡宏平保留最终所有权</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Product Modal -->
+  <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-black/50" onclick="closeModal()"></div>
+    <div class="relative bg-white w-full max-w-2xl rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <!-- Close Button -->
+      <button
+        onclick="closeModal()"
+        class="absolute top-4 right-4 z-10 p-2 bg-white/80 rounded-full hover:bg-white"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <!-- Modal Content -->
+      <div id="modal-content">
+        <!-- Content will be generated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample data
+    const products = [
+      {
+        id: 1,
+        name: '有机小菠菜',
+        price: 5.99,
+        unit: '500g',
+        stock: 85,
+        category: 'leafy',
+        origin: '云南高原基地',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '新鲜嫩绿的高原有机菠菜，叶片肥厚营养丰富，适合清炒或做汤。',
+        nutrition: '富含铁、叶酸、维生素A、C、K',
+        rating: 4.8
+      },
+      {
+        id: 2,
+        name: '有机胡萝卜',
+        price: 3.50,
+        unit: '500g',
+        stock: 120,
+        category: 'root',
+        origin: '山东潍坊',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '脆甜多汁的胡萝卜，色泽橙黄亮丽，生食熟食皆宜。',
+        nutrition: '富含胡萝卜素、维生素B1、B2',
+        rating: 4.7
+      },
+      {
+        id: 3,
+        name: '新鲜番茄',
+        price: 4.99,
+        unit: '500g',
+        stock: 15,
+        category: 'fruit',
+        origin: '新疆吐鲁番',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '沙瓤多汁的番茄，自然成熟、酸甜可口，营养价值高。',
+        nutrition: '富含番茄红素、维生素C、E',
+        rating: 4.9
+      },
+      {
+        id: 4,
+        name: '有机白玉菇',
+        price: 8.50,
+        unit: '200g',
+        stock: 45,
+        category: 'mushroom',
+        origin: '福建古田',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '洁白如玉的白玉菇，口感嫩滑，营养丰富的食用菌。',
+        nutrition: '富含蛋白质、氨基酸、钙铁锌',
+        rating: 4.6
+      },
+      {
+        id: 5,
+        name: '新鲜土豆',
+        price: 2.99,
+        unit: '500g',
+        stock: 200,
+        category: 'root',
+        origin: '甘肃定西',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '黄皮黄心的土豆，淀粉含量高，适合炖煮或炒制。',
+        nutrition: '富含碳水化合物、维生素C、B族',
+        rating: 4.5
+      },
+      {
+        id: 6,
+        name: '有机生菜',
+        price: 4.50,
+        unit: '300g',
+        stock: 60,
+        category: 'leafy',
+        origin: '北京郊区',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '脆嫩多汁的生菜，叶片翠绿新鲜，适合做沙拉或夹汉堡。',
+        nutrition: '富含膳食纤维、维生素K、A',
+        rating: 4.7
+      },
+      {
+        id: 7,
+        name: '新鲜青椒',
+        price: 5.50,
+        unit: '400g',
+        stock: 8,
+        category: 'fruit',
+        origin: '山东寿光',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '翠绿爽脆的青椒，微辣鲜香，炒菜配菜首选。',
+        nutrition: '富含维生素C、胡萝卜素',
+        rating: 4.6
+      },
+      {
+        id: 8,
+        name: '有机香菇',
+        price: 12.00,
+        unit: '250g',
+        stock: 30,
+        category: 'mushroom',
+        origin: '浙江庆元',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '肉质肥厚的香菇，香味浓郁，是烹饪提鲜的佳品。',
+        nutrition: '富含蛋白质、维生素D、钾',
+        rating: 4.8
+      },
+      {
+        id: 9,
+        name: '新鲜大蒜',
+        price: 6.50,
+        unit: '300g',
+        stock: 150,
+        category: 'root',
+        origin: '山东金乡',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '瓣大肉厚的紫皮大蒜，辛辣味浓，抗菌保健。',
+        nutrition: '富含大蒜素、硒、维生素B6',
+        rating: 4.7
+      },
+      {
+        id: 10,
+        name: '有机西兰花',
+        price: 7.50,
+        unit: '400g',
+        stock: 0,
+        category: 'leafy',
+        origin: '云南昆明',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '花球紧密翠绿的西兰花，营养价值极高的健康蔬菜。',
+        nutrition: '富含维生素C、K、叶酸、抗癌物质',
+        rating: 4.9
+      },
+      {
+        id: 11,
+        name: '新鲜黄瓜',
+        price: 3.99,
+        unit: '500g',
+        stock: 90,
+        category: 'fruit',
+        origin: '河北保定',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '清脆爽口的黄瓜，水分充足，夏日解暑佳品。',
+        nutrition: '富含水分、维生素K、C',
+        rating: 4.5
+      },
+      {
+        id: 12,
+        name: '新鲜洋葱',
+        price: 2.50,
+        unit: '500g',
+        stock: 180,
+        category: 'root',
+        origin: '甘肃酒泉',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '白皮洋葱，辛辣味适中，炒菜提味必备。',
+        nutrition: '富含硫化物、前列腺素A',
+        rating: 4.4
+      },
+      {
+        id: 13,
+        name: '散养土鸡',
+        price: 88.00,
+        unit: '只',
+        stock: 30,
+        category: 'poultry',
+        origin: '湖南怀化',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '散养土鸡，肉质紧实，营养丰富，适合炖汤或红烧。',
+        nutrition: '富含蛋白质、氨基酸、微量元素',
+        rating: 4.9
+      },
+      {
+        id: 14,
+        name: '土鸡蛋',
+        price: 2.50,
+        unit: '个',
+        stock: 200,
+        category: 'poultry',
+        origin: '湖南怀化',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '散养土鸡蛋，蛋黄饱满，营养丰富，适合蒸煮或煎炒。',
+        nutrition: '富含蛋白质、维生素A、D、E',
+        rating: 4.8
+      },
+      {
+        id: 15,
+        name: '鸭腿',
+        price: 18.00,
+        unit: '500g',
+        stock: 50,
+        category: 'poultry',
+        origin: '湖南怀化',
+        image: 'https://pic.nximg.cn/file/20211208/31527039_110920890120_2.jpg',
+        description: '新鲜鸭腿，肉质鲜嫩，适合烧烤或卤制。',
+        nutrition: '富含蛋白质、B族维生素、铁',
+        rating: 4.6
+      }
+    ];
+
+    let selectedCategory = 'all';
+    let searchQuery = '';
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      renderProducts();
+    });
+
+    // Render products based on selected category and search query
+    function renderProducts() {
+      const productsGrid = document.getElementById('products-grid');
+      const noProducts = document.getElementById('no-products');
+      
+      if (!productsGrid || !noProducts) return;
+
+      const filteredProducts = products
+        .filter(p => selectedCategory === 'all' || p.category === selectedCategory)
+        .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      if (filteredProducts.length === 0) {
+        productsGrid.innerHTML = '';
+        noProducts.classList.remove('hidden');
+        return;
+      }
+
+      noProducts.classList.add('hidden');
+      productsGrid.innerHTML = '';
+
+      filteredProducts.forEach(product => {
+        const isSoldOut = product.stock === 0;
+        const isLowStock = product.stock > 0 && product.stock <= 20;
+        const stockPercentage = Math.min((product.stock / 200) * 100, 100);
+
+        const stockBadge = isSoldOut ? 
+          { text: '已售罄', class: 'badge-soldout' } : 
+          isLowStock ? 
+          { text: '库存紧张', class: 'badge-low' } : 
+          { text: '库存充足', class: 'badge-stock' };
+
+        const productCard = document.createElement('div');
+        productCard.className = `card group cursor-pointer ${isSoldOut ? 'opacity-60' : ''}`;
+        productCard.onclick = () => !isSoldOut && showProductDetails(product);
+
+        productCard.innerHTML = `
+          <div class="relative overflow-hidden">
+            <img
+              src="${product.image}"
+              alt="${product.name}"
+              class="${isSoldOut ? 'grayscale' : ''} w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <!-- Stock Badge -->
+            <div class="absolute top-2 right-2">
+              <span class="badge ${stockBadge.class}">
+                ${stockBadge.text}
+              </span>
+            </div>
+          </div>
+
+          <div class="p-4">
+            <h3 class="font-semibold text-lg text-gray-800 mb-2 group-hover:text-[var(--primary)] transition-colors">
+              ${product.name}
+            </h3>
+
+            <!-- Origin -->
+            <div class="flex items-center text-sm text-gray-500 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-1"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>${product.origin}</span>
+            </div>
+
+            <!-- Price -->
+            <div class="flex items-baseline gap-2 mb-3">
+              <span class="text-2xl font-bold text-[var(--accent)]">¥${product.price.toFixed(2)}</span>
+              <span class="text-sm text-gray-400">/${product.unit}</span>
+            </div>
+
+            <!-- Stock Info -->
+            <div class="mb-2">
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-500">库存</span>
+                <span class="font-medium ${isLowStock ? 'text-orange-500' : 'text-gray-700'}">
+                  ${isSoldOut ? '0' : product.stock}${product.unit}
+                </span>
+              </div>
+              <div class="stock-bar">
+                <div
+                  class="stock-bar-fill ${isLowStock ? 'bg-orange-400' : 'bg-green-500'}"
+                  style="width: ${stockPercentage}%"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center">
+              <div class="flex items-center text-amber-400">
+                ${generateStars(product.rating)}
+              </div>
+              <span class="text-sm text-gray-500 ml-2">${product.rating}</span>
+            </div>
+          </div>
+        `;
+
+        productsGrid.appendChild(productCard);
+      });
+    }
+
+    // Generate star rating HTML
+    function generateStars(rating) {
+      let stars = '';
+      for (let i = 1; i <= 5; i++) {
+        if (i <= Math.floor(rating)) {
+          stars += `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 fill-current"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        } else {
+          stars += `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-300"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
+        }
+      }
+      return stars;
+    }
+
+    // Filter products by category
+    function filterProducts(category) {
+      selectedCategory = category;
+      
+      // Update category buttons
+      document.querySelectorAll('[id^="category-"]').forEach(button => {
+        if (button.id === `category-${category}`) {
+          button.classList.remove('bg-white', 'text-gray-600', 'hover:bg-gray-100');
+          button.classList.add('bg-[var(--primary)]', 'text-white', 'shadow-lg');
+        } else {
+          button.classList.remove('bg-[var(--primary)]', 'text-white', 'shadow-lg');
+          button.classList.add('bg-white', 'text-gray-600', 'hover:bg-gray-100');
+        }
+      });
+
+      renderProducts();
+    }
+
+    // Handle search
+    function handleSearch(event) {
+      event.preventDefault();
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchQuery = searchInput.value;
+        renderProducts();
+      }
+    }
+
+    // Show product details
+    function showProductDetails(product) {
+      const modal = document.getElementById('product-modal');
+      const modalContent = document.getElementById('modal-content');
+      
+      if (!modal || !modalContent) return;
+
+      const isSoldOut = product.stock === 0;
+      const isLowStock = product.stock > 0 && product.stock <= 20;
+
+      modalContent.innerHTML = `
+        <!-- Image -->
+        <div class="relative h-64 md:h-80">
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+            class="${isSoldOut ? 'grayscale' : ''} w-full h-full object-cover"
+          />
+          <div class="absolute bottom-4 left-4">
+            <span class="badge ${isSoldOut ? 'badge-soldout' : isLowStock ? 'badge-low' : 'badge-stock'}">
+              ${isSoldOut ? '已售罄' : isLowStock ? '库存紧张' : '库存充足'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+          <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
+
+          <div class="flex items-center text-gray-500 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-1"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>产地：${product.origin}</span>
+          </div>
+
+          <p class="text-gray-600 mb-6">${product.description}</p>
+
+          <!-- Nutrition -->
+          <div class="bg-green-50 rounded-lg p-4 mb-6">
+            <h4 class="font-semibold text-green-800 mb-2">营养价值</h4>
+            <p class="text-green-700 text-sm">${product.nutrition}</p>
+          </div>
+
+          <!-- Price & Stock -->
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-[var(--accent)]">¥${product.price.toFixed(2)}</span>
+                <span class="text-gray-400">/${product.unit}</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm text-gray-500">剩余库存</div>
+              <div class="text-xl font-bold ${isLowStock ? 'text-orange-500' : 'text-green-600'}">
+                ${isSoldOut ? '0' : product.stock}${product.unit}
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Button -->
+          <div class="border-t pt-6">
+            <p class="text-center text-gray-500 mb-4">如需购买，请通过以下方式联系我们</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <a
+                href="tel:17398727186"
+                class="flex-1 flex items-center justify-center gap-2 bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--primary)]/90 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                电话咨询
+              </a>
+              <a
+                href="sms:17398727186"
+                class="flex-1 flex items-center justify-center gap-2 bg-[var(--accent)] text-white px-6 py-3 rounded-lg font-medium hover:bg-[var(--accent)]/90 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                短信询价
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    // Close modal
+    function closeModal() {
+      const modal = document.getElementById('product-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
